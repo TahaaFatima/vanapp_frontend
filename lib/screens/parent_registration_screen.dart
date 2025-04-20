@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ParentRegistrationScreen extends StatefulWidget {
   const ParentRegistrationScreen({super.key});
@@ -18,6 +19,8 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
 
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController        = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
   final List<Map<String, String>> children = [];
@@ -93,20 +96,27 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final uri = Uri.parse("http://10.0.2.2:3000/api/register/parent");
+    if (passwordController.text != confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
+    final uri = Uri.parse("${dotenv.env['BASE_URL']}/api/register/parent");
 
     var request = http.MultipartRequest('POST', uri);
-
 
     request.fields['fullName'] = fullNameController.text;
     request.fields['email'] = emailController.text;
     request.fields['phone'] = phoneController.text;
 
+    request.fields['password'] = passwordController.text;
+
     request.fields['emergencyName'] = emergencyName ?? '';
     request.fields['emergencyPhone'] = emergencyPhone ?? '';
     request.fields['emergencyRelation'] = emergencyRelation ?? '';
 
-    // Hardcoded pickup coordinates (replace with map later)
     request.fields['pickupLat'] = '24.8607';
     request.fields['pickupLng'] = '67.0011';
 
@@ -120,12 +130,14 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
     }
 
     final response = await request.send();
-  print(response);
+
     if (response.statusCode == 201) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Registered Successfully!")),
       );
     } else {
+      final res = await http.Response.fromStream(response);
+      print('Error Response: ${res.body}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: ${response.statusCode}")),
       );
@@ -149,6 +161,8 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
             children: [
               _inputField("Full Name", fullNameController),
               _inputField("Email ", emailController),
+               _passwordField(label: "Password", controller: passwordController),
+              _passwordField(label: "Confirm Password", controller: confirmPasswordController),
               _inputField("Phone Number", phoneController),
               const SizedBox(height: 10),
 
@@ -211,7 +225,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                 child: ElevatedButton(
                   onPressed: _submit,
                   style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-                  child: const Text("FIND DRIVER",
+                  child: const Text("Register",
                       style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
@@ -232,6 +246,18 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
           border: const OutlineInputBorder(),
         ),
         validator: (val) => val == null || val.isEmpty ? "Required" : null,
+      ),
+    );
+  }
+
+  Widget _passwordField({required String label, required TextEditingController controller}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: TextFormField(
+        controller: controller,
+        obscureText: true,
+        decoration: InputDecoration(labelText: label, border: OutlineInputBorder()),
+        validator: (value) => value!.isEmpty ? 'Required' : null,
       ),
     );
   }

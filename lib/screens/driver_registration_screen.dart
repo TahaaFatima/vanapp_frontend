@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class DriverRegistrationScreen extends StatefulWidget {
   @override
@@ -11,11 +12,12 @@ class DriverRegistrationScreen extends StatefulWidget {
 class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController vehicleRegController = TextEditingController();
-  final TextEditingController vehicleTypeController = TextEditingController();
+  final TextEditingController phoneController           = TextEditingController();
+  final TextEditingController emailController           = TextEditingController();
+  final TextEditingController passwordController        = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController vehicleRegController      = TextEditingController();
+  final TextEditingController vehicleTypeController     = TextEditingController();
   final TextEditingController vehicleCapacityController = TextEditingController();
 
   File? _profileImage;
@@ -35,7 +37,14 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final uri = Uri.parse('http://10.0.2.2:3000/api/register/driver');
+    if (passwordController.text != confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
+    final uri = Uri.parse('${dotenv.env['BASE_URL']}/api/register/driver');
     final request = http.MultipartRequest('POST', uri);
 
     request.fields['phone'] = phoneController.text;
@@ -83,7 +92,8 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
             children: [
               _textField(label: "Phone Number", controller: phoneController),
               _textField(label: "Email", controller: emailController),
-              _textField(label: "Password", controller: passwordController),
+              _passwordField(label: "Password", controller: passwordController),
+              _passwordField(label: "Confirm Password", controller: confirmPasswordController),
               SizedBox(height: 16),
 
               Text("Upload Profile Picture", style: labelStyle),
@@ -120,4 +130,17 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
       ),
     );
   }
+
+  Widget _passwordField({required String label, required TextEditingController controller}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: TextFormField(
+        controller: controller,
+        obscureText: true,
+        decoration: InputDecoration(labelText: label, border: OutlineInputBorder()),
+        validator: (value) => value!.isEmpty ? 'Required' : null,
+      ),
+    );
+  }
+
 }
