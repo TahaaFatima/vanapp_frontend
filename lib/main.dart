@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Van App',
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
-        primaryColor: Colors.yellow[700],
+        primaryColor: Colors.yellow[600],
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.yellow[700]!,
           primary: Colors.yellow[700]!,
