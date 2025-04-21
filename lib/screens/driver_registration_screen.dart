@@ -11,6 +11,7 @@ class DriverRegistrationScreen extends StatefulWidget {
 class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -38,6 +39,7 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
     final uri = Uri.parse('http://10.0.2.2:3000/api/register/driver');
     final request = http.MultipartRequest('POST', uri);
 
+    request.fields['fullname'] = nameController.text;
     request.fields['phone'] = phoneController.text;
     request.fields['email'] = emailController.text;
     request.fields['password'] = passwordController.text;
@@ -81,6 +83,7 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
           key: _formKey,
           child: Column(
             children: [
+              _textField(label: "Full Name", controller: nameController),
               _textField(label: "Phone Number", controller: phoneController),
               _textField(label: "Email", controller: emailController),
               _textField(label: "Password", controller: passwordController),

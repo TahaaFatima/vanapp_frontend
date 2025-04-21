@@ -48,6 +48,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
         final TextEditingController schoolCtrl = TextEditingController();
 
         return AlertDialog(
+          backgroundColor: Colors.white, // Background of popup
           title: const Text("Add Child"),
           content: SingleChildScrollView(
             child: Column(
@@ -56,12 +57,18 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                     controller: nameCtrl,
                     decoration:
                         const InputDecoration(labelText: "Child’s Name")),
+              SizedBox(height: 16),
+
                 TextField(
                     controller: gradeCtrl,
                     decoration: const InputDecoration(labelText: "Grade")),
+              SizedBox(height: 16),
+
                 TextField(
                     controller: genderCtrl,
                     decoration: const InputDecoration(labelText: "Gender")),
+              SizedBox(height: 16),
+
                 TextField(
                     controller: schoolCtrl,
                     decoration:
@@ -134,12 +141,10 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFFFFB800);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Parent Registration"),
-        backgroundColor: primaryColor,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -190,15 +195,19 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
               const SizedBox(height: 20),
               const Divider(),
               const Text("Emergency Contact",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontWeight: FontWeight.bold )),
               TextFormField(
                 decoration: const InputDecoration(labelText: "Name"),
                 onChanged: (val) => emergencyName = val,
               ),
+              SizedBox(height: 16),
+              
               TextFormField(
                 decoration: const InputDecoration(labelText: "Phone Number"),
                 onChanged: (val) => emergencyPhone = val,
               ),
+              SizedBox(height: 16),
+
               TextFormField(
                 decoration: const InputDecoration(labelText: "Relation"),
                 onChanged: (val) => emergencyRelation = val,
@@ -210,9 +219,8 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: _submit,
-                  style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-                  child: const Text("FIND DRIVER",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: Theme.of(context).elevatedButtonTheme.style,
+                  child: const Text("FIND DRIVER"),
                 ),
               ),
             ],
