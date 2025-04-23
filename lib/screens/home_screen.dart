@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'profile_screen.dart';
+import 'drivers_listing_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final int userId;
@@ -24,14 +26,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchUserData() async {
-    final res = await http.get(Uri.parse('http://localhost:3000/api/user/${widget.userId}'));
+    final res = await http.get(Uri.parse('${dotenv.env['BASE_URL']}/api/user/${widget.userId}'));
     if (res.statusCode == 200) {
       final data = jsonDecode(res.body);
       setState(() {
         userName = data['email']; // or data['name'] if available
         _screens.addAll([
           Center(child: Text("Home Page")),
-          Center(child: Text("Explore")),
+          DriversListingScreen(),
           Center(child: Text("Notifications")),
           ProfileScreen(userId: widget.userId),
         ]);
@@ -58,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Explore"),
+          BottomNavigationBarItem(icon: Icon(Icons.directions_bus_filled), label: "Drivers"),
           BottomNavigationBarItem(icon: Icon(Icons.notifications), label: "Alerts"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
